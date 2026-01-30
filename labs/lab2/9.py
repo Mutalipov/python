@@ -1,6 +1,8 @@
 n = int(input())
 nums = list(map(int, input().split()))
 
-nums = sorted(nums)
+max_value = max(nums)
+min_value = min(nums)
 
-print(*nums[::-1])
+nums = [min_value if x==max_value else x for x in nums]
+print(*nums)
