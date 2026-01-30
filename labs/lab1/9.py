@@ -1,3 +1,2 @@
 a = input()
-print(a.upper())
-print(a.lower())
+print(len(a))
