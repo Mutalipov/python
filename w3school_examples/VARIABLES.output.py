@@ -11,3 +11,7 @@ x = "Python "
 y = "is "
 z = "awesome"
 print(x + y + z)
+#+ in int print()
+x = 5
+y = 10
+print(x + y)
