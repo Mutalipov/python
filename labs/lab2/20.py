@@ -5,7 +5,7 @@ for _ in range(n):
     request = y[0]
     key = y[1]
     if request == "set":
-        value = y[2]
+        value = " ".join(y[2:])
         db[key] = value
     elif request == "get":
         if(key in db.keys()):
