@@ -16,9 +16,9 @@ my_function()
 my_function()
 
 #function names (valid)
-calculate_sum()
+'''calculate_sum()
 _private_function()
-myFunction2()
+myFunction2()'''
 
 
 #why we use functions? In order to don't do same tasks several times
