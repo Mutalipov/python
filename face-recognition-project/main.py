@@ -1,71 +1,81 @@
 import cv2
 import mediapipe as mp
+from mediapipe.tasks import python
+from mediapipe.tasks.python import vision
 from deepface import DeepFace
 import os
+import threading
+import numpy as np
 
-# Путь к вашему фото
-REFERENCE_IMG = "owner.jpg"
+# --- Настройки ---
+REFERENCE_IMG = "owner.jpeg"
+MODEL_PATH = "detector.bundle" # См. примечание ниже
 
-# Инициализация MediaPipe для быстрого обнаружения лиц
-mp_face_detection = mp.solutions.face_detection
-face_detection = mp_face_detection.FaceDetection(model_selection=0, min_detection_confidence=0.5)
+class FaceIDSystem:
+    def __init__(self):
+        self.is_verified = False
+        self.lock = threading.Lock()
+        self.counter = 0
+        
+        # Загрузка детектора лиц (MediaPipe Task)
+        # Нужно скачать файл модели: https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite
+        base_options = python.BaseOptions(model_asset_path='face_detector.tflite')
+        options = vision.FaceDetectorOptions(base_options=base_options)
+        self.detector = vision.FaceDetector.create_from_options(options)
 
+    def verify_face(self, frame):
+        """Фоновая проверка лица через DeepFace"""
+        try:
+            # Используем более быструю модель Facenet512 или VGG-Face
+            result = DeepFace.verify(frame, REFERENCE_IMG, 
+                                     model_name="VGG-Face", 
+                                     enforce_detection=False,
+                                     detector_backend="skip") # Пропускаем детекцию, т.к. она уже сделана
+            with self.lock:
+                self.is_verified = result['verified']
+        except Exception as e:
+            print(f"Ошибка анализа: {e}")
 
-def check_face(frame):
-    """Сравнивает лицо на кадре с эталоном"""
-    try:
-        # DeepFace сравнивает лицо на кадре с вашим фото
-        result = DeepFace.verify(frame, REFERENCE_IMG, model_name="VGG-Face", enforce_detection=False)
-        return result['verified']
-    except Exception as e:
-        return False
+    def run(self):
+        cap = cv2.VideoCapture(0)
+        
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret: break
 
+            # Конвертация для MediaPipe
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
+            
+            # Детекция лиц
+            detection_result = self.detector.detect(mp_image)
 
-def main():
-    if not os.path.exists(REFERENCE_IMG):
-        print(f"Пожалуйста, положите фото {REFERENCE_IMG} в папку со скриптом!")
-        return
+            if detection_result.detections:
+                for detection in detection_result.detections:
+                    bbox = detection.bounding_box
+                    x, y, w, h = bbox.origin_x, bbox.origin_y, bbox.width, bbox.height
+                    
+                    # Рисуем рамку
+                    color = (0, 255, 0) if self.is_verified else (0, 0, 255)
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
+                    
+                    # Запускаем проверку раз в 30 кадров в отдельном потоке
+                    self.counter += 1
+                    if self.counter % 30 == 0:
+                        thread = threading.Thread(target=self.verify_face, args=(frame.copy(),))
+                        thread.start()
 
-    cap = cv2.VideoCapture(0)
-    print("Система запущена. Нажмите 'q' для выхода.")
+            cv2.imshow('FaceID Python 3.12', frame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
 
-    counter = 0  # Счетчик кадров, чтобы не перегружать процессор проверкой каждую секунду
-
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            break
-
-        # 1. Быстрое обнаружение лица через MediaPipe
-        results = face_detection.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-
-        if results.detections:
-            for detection in results.detections:
-                # Рисуем рамку
-                bboxC = detection.location_data.relative_bounding_box
-                ih, iw, _ = frame.shape
-                bbox = int(bboxC.xmin * iw), int(bboxC.ymin * ih), \
-                    int(bboxC.width * iw), int(bboxC.height * ih)
-
-                cv2.rectangle(frame, bbox, (255, 0, 255), 2)
-
-                # 2. Каждые 30 кадров проверяем, вы ли это (чтобы не тормозило)
-                counter += 1
-                if counter % 30 == 0:
-                    if check_face(frame):
-                        print("✅ ДОСТУП РАЗРЕШЕН")
-                        # Здесь можно вставить команду разблокировки
-                    else:
-                        print("❌ ЛИЦО НЕ УЗНАНО")
-
-        cv2.imshow('MediaPipe FaceID', frame)
-
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-    cap.release()
-    cv2.destroyAllWindows()
-
+        cap.release()
+        cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    main()
+    # Важно: скачайте модель детектора face_detector.tflite перед запуском!
+    if not os.path.exists(REFERENCE_IMG):
+        print(f"Ошибка: положите файл {REFERENCE_IMG} в папку")
+    else:
+        app = FaceIDSystem()
+        app.run()
