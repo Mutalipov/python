@@ -7,7 +7,7 @@ import math
 p.init()
 WIDTH, HEIGHT = 600, 600
 screen = p.display.set_mode((WIDTH, HEIGHT))
-p.display.set_caption("Realistic Snake Pro")
+p.display.set_caption("Snake Game")
 clock = p.time.Clock()
 font = p.font.SysFont("Segoe UI", 25, bold=True)
 
