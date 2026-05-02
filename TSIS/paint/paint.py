@@ -5,10 +5,9 @@ from datetime import datetime
 
 p.init()
 
-# --- Screen & Icons ---
-# Ensure "images/icon_paint.png" exists or update the path
+# Screen & Icons
 try:
-    icon = p.image.load("images/icon_paint.png")
+    icon = p.image.load("icon_paint.png")
     p.display.set_icon(icon)
 except:
     print("Icon not found, using default.")
@@ -20,12 +19,12 @@ clock = p.time.Clock()
 font = p.font.SysFont("Arial", 12, bold=True)
 large_font = p.font.SysFont("Arial", 18, bold=True)
 
-# --- Canvas ---
+# Canvas 
 canvas_offset = (100, 150)
 canvas = p.Surface((800, 600))
 canvas.fill((255, 255, 255))
 
-# --- State Variables ---
+# State Variables
 color = (0, 0, 0)
 brush_size = 3
 tool = "draw"
@@ -35,7 +34,7 @@ text_input = ""
 text_pos = None
 last_draw_pos = None
 
-# --- UI Definitions ---
+# UI Definitions
 btns = {
     # Colors
     "black":   {"rect": p.Rect(10, 10, 40, 40), "color": (0,0,0)},
@@ -92,7 +91,7 @@ def get_shape_points(shape_type, start, end):
         return [(x1 + w/2, y1), (x2, y1 + h/2), (x1 + w/2, y2), (x1, y1 + h/2)]
     return []
 
-# --- Main Loop ---
+# Main Loop 
 running = True
 while running:
     mx, my = p.mouse.get_pos()
@@ -103,18 +102,18 @@ while running:
             running = False
 
         if event.type == p.KEYDOWN:
-            # 3.2 Brush Size Shortcuts
+            # Brush Size Shortcuts
             if event.key == p.K_1: brush_size = 2
             if event.key == p.K_2: brush_size = 5
             if event.key == p.K_3: brush_size = 10
             
-            # 3.4 Save Canvas (Ctrl+S)
+            # Save Canvas (Ctrl+S)
             if event.key == p.K_s and (p.key.get_mods() & p.KMOD_CTRL):
                 fname = f"paint_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
                 p.image.save(canvas, fname)
                 print(f"Canvas saved as {fname}")
 
-            # 3.5 Text Tool Logic
+            # Text Tool Logic
             if tool == "text" and text_pos:
                 if event.key == p.K_RETURN:
                     txt_surf = large_font.render(text_input, True, color)
@@ -170,7 +169,7 @@ while running:
                 drawing = False
                 start_pos = None
 
-    # 3.1 Freehand (Pencil) Tool
+    # Freehand (Pencil) Tool
     if drawing and tool == "draw":
         if 0 <= cx < 800 and 0 <= cy < 600:
             p.draw.line(canvas, color, last_draw_pos, (cx, cy), brush_size)
@@ -178,7 +177,7 @@ while running:
             p.draw.circle(canvas, color, (cx, cy), brush_size // 2)
             last_draw_pos = (cx, cy)
 
-    # --- DRAWING EVERYTHING ---
+    # DRAWING EVERYTHING 
     screen.fill((230, 230, 230))
     
     # UI Buttons
@@ -203,7 +202,7 @@ while running:
     screen.blit(canvas, canvas_offset)
     p.draw.rect(screen, (0,0,0), (canvas_offset[0], canvas_offset[1], 800, 600), 2)
 
-    # --- LIVE PREVIEWS ---
+    # LIVE PREVIEWS
     if drawing and start_pos and tool != "draw":
         ps = (start_pos[0] + canvas_offset[0], start_pos[1] + canvas_offset[1])
         if tool == "line":
