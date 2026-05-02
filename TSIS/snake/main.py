@@ -121,6 +121,9 @@ def screen_main_menu(surface, clock, font_lg, font_md, font_sm, username):
  
 def screen_gameplay(surface, clock, font_md, font_sm, settings, personal_best, eat_sound, game_over_sound, power_up_sound):
     state      = GameState(settings, personal_best)
+    state.eat_sound = eat_sound
+    state.game_over_sound = game_over_sound
+    state.power_up_sound = power_up_sound
     logic_acc  = 0          # milliseconds accumulator
     prev_time  = pygame.time.get_ticks()
  
@@ -332,9 +335,9 @@ def screen_settings(surface, clock, font_lg, font_md, font_sm, settings: dict):
 def main():
     pygame.init()
     pygame.mixer.init()
-    eat_sound = pygame.mixer.Sound("assets/eat.wav")
-    game_over_sound = pygame.mixer.Sound("assets/game_over.wav")
-    power_up_sound = pygame.mixer.Sound("assets/power_up.wav")
+    eat_sound = pygame.mixer.Sound(r"assets/eat.wav")
+    game_over_sound = pygame.mixer.Sound(r"assets/game_over.wav")
+    power_up_sound = pygame.mixer.Sound(r"assets/power_up.wav")
     surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption(TITLE)
     clock = pygame.time.Clock()

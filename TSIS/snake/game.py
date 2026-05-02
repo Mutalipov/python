@@ -174,10 +174,10 @@ class GameState:
     Holds and updates all mutable game state.
     Call .update() each logical tick; call .draw() each frame.
     """
-    def __init__(self, settings: dict, personal_best: int = 0):
+    def __init__(self, settings: dict, personal_best: int = 0, eat_sound=None, game_over_sound=None, power_up_sound=None):
         self.eat_sound = None
         self.game_over_sound = None
-        self.powerup_sound = None
+        self.power_up_sound = None
         self.settings      = settings
         self.personal_best = personal_best
         self.field_powerup = None
@@ -280,7 +280,9 @@ class GameState:
         if self.level >= OBSTACLES_FROM_LVL:
             self._place_obstacles()
 
-    def _apply_powerup(self, pu_type: str):
+    def _apply_powerup(self, pu_type: str, power_up_sound):
+        if self.settings.get("sound", True) and self.power_up_sound:
+            self.power_up_sound.play()
         self.active_pu     = pu_type
         self.active_pu_end = pygame.time.get_ticks() + POWERUP_EFFECT_MS
         if pu_type == PU_SPEED_BOOST:
@@ -351,6 +353,8 @@ class GameState:
                 head = (head[0] % COLS, head[1] % ROWS)
                 self.snake.body[0] = head
             else:
+                if self.game_over_sound and self.settings.get("sound", True):
+                    self.game_over_sound.play()
                 self.game_over = True
                 return
 
@@ -360,6 +364,8 @@ class GameState:
                 self.shield_active = False
                 self.active_pu = None
             else:
+                if self.game_over_sound and self.settings.get("sound", True):
+                    self.game_over_sound.play()
                 self.game_over = True
                 return
 
@@ -369,14 +375,16 @@ class GameState:
                 self.shield_active = False
                 self.active_pu = None
             else:
+                if self.game_over_sound and self.settings.get("sound", True):
+                    self.game_over_sound.play()
                 self.game_over = True
                 return
 
         # Food collision
         eaten = [f for f in self.foods if f.pos == head]
-        if eaten and self.settings["sound"] and self.eat_sound:
-            self.eat_sound.play()
         for food in eaten:
+            if self.eat_sound and self.settings.get("sound", True):
+                self.eat_sound.play()
             self.foods.remove(food)
             if food.type == FOOD_POISON:
                 alive = self.snake.shorten(POISON_SHORTEN)
