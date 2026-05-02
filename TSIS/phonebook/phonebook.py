@@ -5,9 +5,7 @@ import sys
 from datetime import date, datetime
 from connect import get_connection
 
-# ─────────────────────────────────────────────────────────────────────────────
 # Helpers
-# ─────────────────────────────────────────────────────────────────────────────
 
 def _json_serial(obj):
     """JSON serialiser for date/datetime objects."""
@@ -38,9 +36,7 @@ def _print_contacts(rows):
     print(sep)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 3.1 Schema initialisation
-# ─────────────────────────────────────────────────────────────────────────────
+# Schema initialisation
 
 def init_schema():
     """Run schema.sql and procedures.sql to set up the DB."""
@@ -59,9 +55,7 @@ def init_schema():
         conn.close()
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 3.2 Console Search & Filter
-# ─────────────────────────────────────────────────────────────────────────────
+# Console Search & Filter
 
 def filter_by_group():
     """Show contacts belonging to a chosen group."""
@@ -221,9 +215,7 @@ def paginated_browse():
         conn.close()
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 3.3 Import / Export
-# ─────────────────────────────────────────────────────────────────────────────
+# Import / Export
 
 def export_to_json(filepath="contacts_export.json"):
     """Export all contacts (with phones and group) to a JSON file."""
@@ -436,9 +428,7 @@ def import_from_csv(filepath="contacts.csv"):
         conn.close()
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 3.4 Stored Procedure Wrappers
-# ─────────────────────────────────────────────────────────────────────────────
+#  Stored Procedure Wrappers
 
 def add_phone_to_contact():
     """Call the add_phone stored procedure."""
@@ -497,13 +487,11 @@ def full_search():
         conn.close()
 
 
-# ─────────────────────────────────────────────────────────────────────────────
 # Main menu
-# ─────────────────────────────────────────────────────────────────────────────
 
 MENU = """
 ╔══════════════════════════════════════════╗
-║   PhoneBook TSIS 1 — Extended Features   ║
+║   PhoneBook TSIS 1                       ║
 ╠══════════════════════════════════════════╣
 ║  Schema                                  ║
 ║   0. Initialise / update DB schema       ║

@@ -1,8 +1,6 @@
 
--- ------------------------------------------------------------
 -- 1. add_phone(contact_name, phone, type)
 --    Adds a phone number to an existing contact.
--- ------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE add_phone(
     p_contact_name VARCHAR,
     p_phone        VARCHAR,
@@ -32,10 +30,8 @@ END;
 $$;
 
 
--- ------------------------------------------------------------
 -- 2. move_to_group(contact_name, group_name)
 --    Moves a contact to a group; creates the group if missing.
--- ------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE move_to_group(
     p_contact_name VARCHAR,
     p_group_name   VARCHAR
@@ -72,11 +68,11 @@ END;
 $$;
 
 
--- ------------------------------------------------------------
+
 -- 3. search_contacts(query TEXT)
 --    Searches name, email, AND all phones in the phones table.
 --    Returns a result set of matching contacts.
--- ------------------------------------------------------------
+
 CREATE OR REPLACE FUNCTION search_contacts(p_query TEXT)
 RETURNS TABLE (
     contact_id INTEGER,
