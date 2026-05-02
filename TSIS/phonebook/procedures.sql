@@ -1,7 +1,3 @@
--- ============================================================
--- PhoneBook Stored Procedures & Functions — TSIS 1
--- (Procedures from Practice 8 are NOT duplicated here)
--- ============================================================
 
 -- ------------------------------------------------------------
 -- 1. add_phone(contact_name, phone, type)

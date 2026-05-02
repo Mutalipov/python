@@ -1,8 +1,3 @@
-"""
-phonebook.py — TSIS 1: Extended PhoneBook Console Application
-Builds on Practice 7 (CRUD, CSV import) and Practice 8 (stored procedures,
-pagination, pattern search). Only NEW features are implemented here.
-"""
 
 import csv
 import json
@@ -65,7 +60,7 @@ def init_schema():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# 3.2 Advanced Console Search & Filter
+# 3.2 Console Search & Filter
 # ─────────────────────────────────────────────────────────────────────────────
 
 def filter_by_group():
