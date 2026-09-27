@@ -56,7 +56,7 @@ class Snake:
         self.body = [start, (start[0] - 1, start[1]), (start[0] - 2, start[1])]
         self.direction = RIGHT
         self.next_dir   = RIGHT
-        self.grow_count = 0
+        self.grow_count = 5
         self.color      = tuple(color)
 
     # Direction
@@ -394,7 +394,7 @@ class GameState:
             else:
                 self.score     += food.points * self.level
                 self.food_eaten += 1
-                self.snake.grow()
+                alive = self.snake.shorten(POISON_SHORTEN)
                 if self.food_eaten >= FOOD_PER_LEVEL:
                     self._advance_level()
             # Possibly spawn poison after eating
